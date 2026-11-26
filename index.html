@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="tj">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>MRX-COMPILER — Ҳалкунаки масъалаҳои математикӣ, физикӣ ва химиявӣ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="blueprint-bg" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <svg class="compass logo-badge" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="18.5" fill="#0c1428" stroke="var(--accent)" stroke-width="1.4"/>
+      <circle class="arc" cx="20" cy="20" r="14.5" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <text x="20" y="24.5" text-anchor="middle" font-family="Sora, sans-serif" font-weight="700" font-size="12.5" fill="var(--accent-2)">MRX</text>
+      <circle cx="20" cy="6.2" r="1.3" fill="var(--accent-2)"/>
+    </svg>
+    <div class="brand-text">
+      <h1>MRX-COMPILER</h1>
+      <p data-i18n="tagline">Ҳалкунаки масъалаҳои математикӣ, физикӣ ва химиявӣ</p>
+    </div>
+  </div>
+  <div class="head-actions">
+    <div class="lang-switch" id="langSwitch">
+      <button class="lang-btn is-active" data-lang="tj">ТҶ</button>
+      <button class="lang-btn" data-lang="ru">РУ</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="uz">UZ</button>
+    </div>
+    <button id="toggleHistory" class="icon-btn" aria-label="Таърих" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="subject-switch" id="subjectSwitch">
+  <button class="subject-btn is-active" data-subject="math"><span data-i18n="subj-math">Математика</span></button>
+  <button class="subject-btn" data-subject="physics"><span data-i18n="subj-physics">Физика</span></button>
+  <button class="subject-btn" data-subject="chemistry"><span data-i18n="subj-chem">Химия</span></button>
+</nav>
+
+<section class="result-dock" id="resultDock">
+  <div class="result-head">
+    <span class="result-tag" id="resultTag" data-i18n="result-tag">Ҷавоб</span>
+    <div class="result-actions">
+      <button id="copyResult" class="ghost-btn" title="Нусха бардоштан">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      </button>
+    </div>
+  </div>
+  <pre id="result" data-i18n="welcome">Салом! Мавзӯъ ва амалро интихоб ва рақамҳоро ворид карда, тугмаро зер кунед.</pre>
+</section>
+
+<aside class="history-drawer" id="historyDrawer">
+  <div class="history-head">
+    <h2 data-i18n="history-title">Таърихи ҳалҳо</h2>
+    <button id="clearHistory" class="ghost-btn small" data-i18n="history-clear">Пок кардан</button>
+  </div>
+  <ul id="historyList" class="history-list"></ul>
+  <p id="historyEmpty" class="small muted" data-i18n="history-empty">Ҳанӯз ҳисобе нест.</p>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<div class="subject" id="subject-math" data-subject-panel="math">
+
+<nav class="tabs" id="tabs" role="tablist">
+  <button class="tab-btn is-active" data-target="panel-universal" role="tab"><span data-i18n="tab-solver">Ҳалкунак</span></button>
+  <button class="tab-btn" data-target="panel-algebra" role="tab"><span data-i18n="tab-algebra">Алгебра</span></button>
+  <button class="tab-btn" data-target="panel-geometry" role="tab"><span data-i18n="tab-geometry">Геометрия</span></button>
+  <button class="tab-btn" data-target="panel-stats" role="tab"><span data-i18n="tab-stats">Статистика</span></button>
+  <button class="tab-btn" data-target="panel-problems" role="tab"><span data-i18n="tab-problems">Масъалаҳо</span></button>
+</nav>
+
+<main class="stage">
+
+    <section class="panel is-active" id="panel-universal">
+    <div class="panel-card">
+      <h2>Ҳалкунаки умумӣ</h2>
+      <p class="small muted">Масъаларо ба забони оддӣ дар як майдон нависед — барнома худаш рақамҳо ва намуди масъаларо ёфта ҳал мекунад.</p>
+      <p class="small muted">Намуна: <span class="tag-mono">2x+3=x-7</span> &nbsp; <span class="tag-mono">x²-5x+6&gt;0</span> &nbsp; <span class="tag-mono">√(x+2)=x</span> &nbsp; «25% аз 80 чанд аст?» &nbsp; «масофа 120 км, суръат 60, вақт чӣ қадар?» &nbsp; «3 аз 10 эҳтимолият»</p>
+      <div class="field">
+        <label for="uniInput">Матни масъала</label>
+        <textarea id="uniInput" rows="4" placeholder="Масъаларо ин ҷо нависед..."></textarea>
+      </div>
+
+      <div class="kb-toolbar">
+        <button type="button" class="ghost-btn small" id="toggleLetterKeys">🔤 <span data-i18n="kb-toggle">Ҳарфҳо / Letters</span></button>
+      </div>
+      <div class="letter-keys" id="letterKeys" hidden>
+        <div class="letter-lang-switch">
+          <button type="button" class="lkey-lang is-active" data-alpha="tj">Тоҷикӣ</button>
+          <button type="button" class="lkey-lang" data-alpha="en">English</button>
+        </div>
+        <div class="letter-grid" id="letterGrid"></div>
+      </div>
+
+      <div class="mathkeys" id="uniKeys">
+        <button type="button" class="mkey" data-ins="x">x</button>
+        <button type="button" class="mkey" data-ins="x²">x²</button>
+        <button type="button" class="mkey" data-ins="√()" data-offset="2">√( )</button>
+        <button type="button" class="mkey" data-ins="(">(</button>
+        <button type="button" class="mkey" data-ins=")">)</button>
+        <button type="button" class="mkey" data-ins="%">%</button>
+
+        <button type="button" class="mkey">7</button>
+        <button type="button" class="mkey">8</button>
+        <button type="button" class="mkey">9</button>
+        <button type="button" class="mkey" data-ins="=">=</button>
+        <button type="button" class="mkey" data-ins="≥">≥</button>
+        <button type="button" class="mkey" data-ins="≤">≤</button>
+
+        <button type="button" class="mkey">4</button>
+        <button type="button" class="mkey">5</button>
+        <button type="button" class="mkey">6</button>
+        <button type="button" class="mkey" data-ins="+">+</button>
+        <button type="button" class="mkey" data-ins="-">−</button>
+        <button type="button" class="mkey" data-ins="×">×</button>
+
+        <button type="button" class="mkey">1</button>
+        <button type="button" class="mkey">2</button>
+        <button type="button" class="mkey">3</button>
+        <button type="button" class="mkey" data-ins=".">.</button>
+        <button type="button" class="mkey mkey-accent" data-action="backspace">⌫</button>
+        <button type="button" class="mkey mkey-accent" data-action="clear">Тоза</button>
+
+        <button type="button" class="mkey">0</button>
+      </div>
+      <div class="btn-row"><button id="calcUniversal">Ҳал кардан</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-algebra">
+    <div class="panel-card">
+      <h2>Муодилаи хатӣ <span class="tag-mono">ax+b = cx+d</span></h2>
+      <div class="field-grid">
+        <div class="field"><label for="linA">a</label><input id="linA" type="number" step="any" placeholder="a"></div>
+        <div class="field"><label for="linB">b</label><input id="linB" type="number" step="any" placeholder="b"></div>
+        <div class="field"><label for="linC">c</label><input id="linC" type="number" step="any" placeholder="c"></div>
+        <div class="field"><label for="linD">d</label><input id="linD" type="number" step="any" placeholder="d"></div>
+      </div>
+      <div class="btn-row"><button id="calcLinear">Ҳал кардани x</button><button id="randLinear" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Муодилаи квадратӣ <span class="tag-mono">ax²+bx+c = 0</span></h2>
+      <div class="field-grid-3">
+        <div class="field"><label for="quadA">a</label><input id="quadA" type="number" step="any" placeholder="a"></div>
+        <div class="field"><label for="quadB">b</label><input id="quadB" type="number" step="any" placeholder="b"></div>
+        <div class="field"><label for="quadC">c</label><input id="quadC" type="number" step="any" placeholder="c"></div>
+      </div>
+      <div class="btn-row"><button id="calcQuadratic">Ёфтани решаҳо</button><button id="randQuadratic" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Системаи ду муодила</h2>
+      <p class="small muted">a₁x + b₁y = c₁ &nbsp;·&nbsp; a₂x + b₂y = c₂</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="sysA1">a₁</label><input id="sysA1" type="number" step="any"></div>
+        <div class="field"><label for="sysB1">b₁</label><input id="sysB1" type="number" step="any"></div>
+        <div class="field"><label for="sysC1">c₁</label><input id="sysC1" type="number" step="any"></div>
+        <div class="field"><label for="sysA2">a₂</label><input id="sysA2" type="number" step="any"></div>
+        <div class="field"><label for="sysB2">b₂</label><input id="sysB2" type="number" step="any"></div>
+        <div class="field"><label for="sysC2">c₂</label><input id="sysC2" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcSystem">Ҳал кардани x, y</button><button id="randSystem" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Нобаробарии хатӣ <span class="tag-mono">ax+b ⋛ cx+d</span></h2>
+      <div class="field-grid-3">
+        <div class="field"><label for="ineqA">a</label><input id="ineqA" type="number" step="any" placeholder="a"></div>
+        <div class="field"><label for="ineqB">b</label><input id="ineqB" type="number" step="any" placeholder="b"></div>
+        <div class="field">
+          <label for="ineqOp">Аломат</label>
+          <select id="ineqOp">
+            <option value=">">&gt;</option>
+            <option value="<">&lt;</option>
+            <option value=">=">&ge;</option>
+            <option value="<=">&le;</option>
+          </select>
+        </div>
+        <div class="field"><label for="ineqC">c</label><input id="ineqC" type="number" step="any" placeholder="c"></div>
+        <div class="field"><label for="ineqD">d</label><input id="ineqD" type="number" step="any" placeholder="d"></div>
+      </div>
+      <div class="btn-row"><button id="calcInequality">Ҳал кардани нобаробарӣ</button><button id="randInequality" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Нобаробарии квадратӣ <span class="tag-mono">ax²+bx+c ⋛ 0</span></h2>
+      <div class="field-grid-3">
+        <div class="field"><label for="ineqQA">a</label><input id="ineqQA" type="number" step="any" placeholder="a"></div>
+        <div class="field"><label for="ineqQB">b</label><input id="ineqQB" type="number" step="any" placeholder="b"></div>
+        <div class="field"><label for="ineqQC">c</label><input id="ineqQC" type="number" step="any" placeholder="c"></div>
+      </div>
+      <div class="field">
+        <label for="ineqQOp">Аломат (нисбат ба 0)</label>
+        <select id="ineqQOp">
+          <option value=">">&gt; 0</option>
+          <option value="<">&lt; 0</option>
+          <option value=">=">&ge; 0</option>
+          <option value="<=">&le; 0</option>
+        </select>
+      </div>
+      <div class="btn-row"><button id="calcQuadIneq">Ҳал кардани нобаробарӣ</button><button id="randQuadIneq" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Муодилаи иррационалӣ <span class="tag-mono">√(ax+b) = cx+d</span></h2>
+      <p class="small muted">Решаи квадратӣ бо санҷиши решаҳои бегона.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="irrA">a</label><input id="irrA" type="number" step="any" placeholder="a"></div>
+        <div class="field"><label for="irrB">b</label><input id="irrB" type="number" step="any" placeholder="b"></div>
+        <div class="field"><label for="irrC">c</label><input id="irrC" type="number" step="any" placeholder="c"></div>
+        <div class="field"><label for="irrD">d</label><input id="irrD" type="number" step="any" placeholder="d"></div>
+      </div>
+      <div class="btn-row"><button id="calcIrrational">Ёфтани x</button><button id="randIrrational" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-geometry">
+    <div class="panel-card">
+      <h2>Теоремаи Пифагор <span class="tag-mono">a²+b²=c²</span></h2>
+      <p class="small muted">Як майдонро холӣ монед — он ҳисоб карда мешавад.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="pytA">Катети a</label><input id="pytA" type="number" step="any" placeholder="a"></div>
+        <div class="field"><label for="pytB">Катети b</label><input id="pytB" type="number" step="any" placeholder="b"></div>
+        <div class="field"><label for="pytC">Гипотенузаи c</label><input id="pytC" type="number" step="any" placeholder="c"></div>
+      </div>
+      <div class="btn-row"><button id="calcPythagoras">Ҳисоб кардан</button><button id="randPythagoras" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Секунҷа (масоҳат аз рӯи се тараф)</h2>
+      <div class="field-grid-3">
+        <div class="field"><label for="triA">Тарафи a</label><input id="triA" type="number" step="any"></div>
+        <div class="field"><label for="triB">Тарафи b</label><input id="triB" type="number" step="any"></div>
+        <div class="field"><label for="triC">Тарафи c</label><input id="triC" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcTriangle">Масоҳат ва периметр</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Росткунҷа / параллелограмм</h2>
+      <div class="field-row">
+        <div class="field"><label for="rectW">Дарозӣ</label><input id="rectW" type="number" step="any"></div>
+        <div class="field"><label for="rectH">Бар</label><input id="rectH" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcRect">Масоҳат ва периметр</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Давра</h2>
+      <div class="field">
+        <label for="circR">Радиус (ё диаметр)</label>
+        <div class="field-row" style="grid-template-columns:1fr auto;">
+          <input id="circR" type="number" step="any" placeholder="0.0">
+          <select id="circMode" style="width:auto;"><option value="r">радиус</option><option value="d">диаметр</option></select>
+        </div>
+      </div>
+      <div class="btn-row"><button id="calcCircle">Дузиш ва масоҳат</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Ҳаҷм ва сатҳи ҷисмҳо</h2>
+      <div class="field">
+        <label for="volShape">Шакл</label>
+        <select id="volShape">
+          <option value="cube">Куб (тараф a)</option>
+          <option value="box">Параллелепипед (a×b×c)</option>
+          <option value="cylinder">Силиндр (r, h)</option>
+          <option value="sphere">Кура (r)</option>
+          <option value="cone">Конус (r, h)</option>
+        </select>
+      </div>
+      <div class="field-grid-3" id="volFields">
+        <div class="field"><label for="volA">a / r</label><input id="volA" type="number" step="any"></div>
+        <div class="field"><label for="volB">b</label><input id="volB" type="number" step="any"></div>
+        <div class="field"><label for="volC">c / h</label><input id="volC" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcVolume">Ҳисоб кардан</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-stats">
+    <div class="panel-card">
+      <h2>Таҳлили маълумот</h2>
+      <div class="field">
+        <label for="statsData">Рақамҳо (бо вергул ҷудо кунед)</label>
+        <input id="statsData" placeholder="масалан: 4, 8, 6, 5, 3, 8, 9">
+      </div>
+      <div class="btn-row"><button id="calcStats">Ҳисоб кардани миёна, медиана ва ғ.</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Эҳтимолият</h2>
+      <div class="field-row">
+        <div class="field"><label for="probFav">Ҳодисаҳои мусоид</label><input id="probFav" type="number" step="any"></div>
+        <div class="field"><label for="probTotal">Ҳамаи ҳодисаҳо</label><input id="probTotal" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcProbability">Ҳисоб кардани эҳтимолият</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-problems">
+    <div class="panel-card">
+      <h2>Ҳалли масъалаҳо</h2>
+      <div class="field">
+        <label for="probType">Навъи масъала</label>
+        <select id="probType">
+          <option value="percent">Фоиз</option>
+          <option value="proportion">Пропорция (қоидаи се)</option>
+          <option value="motion">Ҳаракат (масофа = суръат × вақт)</option>
+        </select>
+      </div>
+
+      <div class="prob-fields is-active" data-prob="percent">
+        <div class="btn-row"><button id="randPercent" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+        <div class="field">
+          <label for="pctMode">Намуди масъала</label>
+          <select id="pctMode">
+            <option value="ofNumber">Х% аз адад чист?</option>
+            <option value="whatPercent">A чанд фоизи B аст?</option>
+            <option value="change">Тағйирот бо фоиз (афзоиш/камшавӣ)</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="pctVal1">Арзиши 1</label><input id="pctVal1" type="number" step="any"></div>
+          <div class="field"><label for="pctVal2">Арзиши 2</label><input id="pctVal2" type="number" step="any"></div>
+        </div>
+      </div>
+
+      <div class="prob-fields" data-prob="proportion" hidden>
+        <div class="btn-row"><button id="randProportion" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+        <p class="small muted">a / b = c / x</p>
+        <div class="field-grid-3">
+          <div class="field"><label for="propA">a</label><input id="propA" type="number" step="any"></div>
+          <div class="field"><label for="propB">b</label><input id="propB" type="number" step="any"></div>
+          <div class="field"><label for="propC">c</label><input id="propC" type="number" step="any"></div>
+        </div>
+      </div>
+
+      <div class="prob-fields" data-prob="motion" hidden>
+        <div class="btn-row"><button id="randMotion" class="rand-btn" type="button" title="Масъалаи тасодуфӣ">🎲 Тасодуфӣ</button></div>
+        <p class="small muted">Як майдонро холӣ монед — он ҳисоб карда мешавад.</p>
+        <div class="field-grid-3">
+          <div class="field"><label for="motD">Масофа</label><input id="motD" type="number" step="any"></div>
+          <div class="field"><label for="motS">Суръат</label><input id="motS" type="number" step="any"></div>
+          <div class="field"><label for="motT">Вақт</label><input id="motT" type="number" step="any"></div>
+        </div>
+      </div>
+
+      <div class="btn-row"><button id="solveProblem">Ҳал кардан</button></div>
+    </div>
+  </section>
+
+</main>
+</div>
+<div class="subject" id="subject-physics" data-subject-panel="physics" hidden>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn is-active" data-target="panel-mech" role="tab"><span data-i18n="ph-mech">Механика</span></button>
+  <button class="tab-btn" data-target="panel-electric" role="tab"><span data-i18n="ph-elec">Электр</span></button>
+  <button class="tab-btn" data-target="panel-heat" role="tab"><span data-i18n="ph-heat">Гармӣ</span></button>
+  <button class="tab-btn" data-target="panel-pressure" role="tab"><span data-i18n="ph-press">Фишор ва зичӣ</span></button>
+</nav>
+
+<main class="stage">
+
+    <section class="panel is-active" id="panel-mech">
+    <div class="panel-card">
+      <h2>Ҳаракати якхела <span class="tag-mono">s = v·t</span></h2>
+      <p class="small muted">Як майдонро холӣ монед — он ҳисоб карда мешавад.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="mechS">Масофа s (м)</label><input id="mechS" type="number" step="any"></div>
+        <div class="field"><label for="mechV">Суръат v (м/с)</label><input id="mechV" type="number" step="any"></div>
+        <div class="field"><label for="mechT">Вақт t (с)</label><input id="mechT" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcMechUniform">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Ҳаракати тезгирифташуда <span class="tag-mono">v=v₀+at, s=v₀t+at²/2</span></h2>
+      <div class="field-grid-3">
+        <div class="field"><label for="accV0">Суръати ибтидоӣ v₀ (м/с)</label><input id="accV0" type="number" step="any" value="0"></div>
+        <div class="field"><label for="accA">Таъҷил a (м/с²)</label><input id="accA" type="number" step="any"></div>
+        <div class="field"><label for="accT">Вақт t (с)</label><input id="accT" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcMechAccel">Ёфтани v ва s</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Қонуни дуюми Нютон <span class="tag-mono">F = m·a</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="newF">Қувва F (Н)</label><input id="newF" type="number" step="any"></div>
+        <div class="field"><label for="newM">Масса m (кг)</label><input id="newM" type="number" step="any"></div>
+        <div class="field"><label for="newA">Таъҷил a (м/с²)</label><input id="newA" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcNewton">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Кор ва Қувваи механикӣ <span class="tag-mono">A=F·s, N=A/t</span></h2>
+      <div class="field-grid-3">
+        <div class="field"><label for="workF">Қувва F (Н)</label><input id="workF" type="number" step="any"></div>
+        <div class="field"><label for="workS">Масофа s (м)</label><input id="workS" type="number" step="any"></div>
+        <div class="field"><label for="workT">Вақт t (с)</label><input id="workT" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcWork">Ёфтани A ва N</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Энергия <span class="tag-mono">Eк=mv²/2, Eп=mgh</span></h2>
+      <p class="small muted">g = 9.8 м/с² гирифта мешавад.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="energyM">Масса m (кг)</label><input id="energyM" type="number" step="any"></div>
+        <div class="field"><label for="energyV">Суръат v (м/с)</label><input id="energyV" type="number" step="any"></div>
+        <div class="field"><label for="energyH">Баландӣ h (м)</label><input id="energyH" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcEnergy">Ҳисоб кардани энергия</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Импулс <span class="tag-mono">p = m·v</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="impP">Импулс p (кг·м/с)</label><input id="impP" type="number" step="any"></div>
+        <div class="field"><label for="impM">Масса m (кг)</label><input id="impM" type="number" step="any"></div>
+        <div class="field"><label for="impV">Суръат v (м/с)</label><input id="impV" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcImpulse">Ҳисоб кардан</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-electric">
+    <div class="panel-card">
+      <h2>Қонуни Ом <span class="tag-mono">U = I·R</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="ohmU">Шиддат U (В)</label><input id="ohmU" type="number" step="any"></div>
+        <div class="field"><label for="ohmI">Ҷараён I (А)</label><input id="ohmI" type="number" step="any"></div>
+        <div class="field"><label for="ohmR">Муқовимат R (Ом)</label><input id="ohmR" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcOhm">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Қувваи барқ <span class="tag-mono">P = U·I</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="powU">Шиддат U (В)</label><input id="powU" type="number" step="any"></div>
+        <div class="field"><label for="powI">Ҷараён I (А)</label><input id="powI" type="number" step="any"></div>
+        <div class="field"><label for="powP">Қувва P (Вт)</label><input id="powP" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcElecPower">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Пайвасти муқовиматҳо</h2>
+      <div class="field">
+        <label for="resList">Муқовиматҳо (бо вергул ҷудо, Ом)</label>
+        <input id="resList" placeholder="масалан: 4, 6, 12">
+      </div>
+      <div class="field">
+        <label for="resMode">Навъи пайваст</label>
+        <select id="resMode">
+          <option value="series">Силсилавӣ (пай дар пай)</option>
+          <option value="parallel">Параллелӣ</option>
+        </select>
+      </div>
+      <div class="btn-row"><button id="calcResistance">Ёфтани муқовимати умумӣ</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Гармии Ҷоул-Ленс <span class="tag-mono">Q = I²Rt</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="jouleI">Ҷараён I (А)</label><input id="jouleI" type="number" step="any"></div>
+        <div class="field"><label for="jouleR">Муқовимат R (Ом)</label><input id="jouleR" type="number" step="any"></div>
+        <div class="field"><label for="jouleT">Вақт t (с)</label><input id="jouleT" type="number" step="any"></div>
+      </div>
+      <div class="field"><label for="jouleQ">Миқдори гармӣ Q (Ҷ)</label><input id="jouleQ" type="number" step="any"></div>
+      <div class="btn-row"><button id="calcJoule">Ҳисоб кардан</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-heat">
+    <div class="panel-card">
+      <h2>Миқдори гармӣ <span class="tag-mono">Q = c·m·ΔT</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="heatC">Гармигирии хосӣ c (Ҷ/кг·К)</label><input id="heatC" type="number" step="any" placeholder="масалан: 4200 (об)"></div>
+        <div class="field"><label for="heatM">Масса m (кг)</label><input id="heatM" type="number" step="any"></div>
+        <div class="field"><label for="heatDT">Тағйироти ҳарорат ΔT (К)</label><input id="heatDT" type="number" step="any"></div>
+      </div>
+      <div class="field"><label for="heatQ">Миқдори гармӣ Q (Ҷ)</label><input id="heatQ" type="number" step="any"></div>
+      <div class="btn-row"><button id="calcHeatCapacity">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Гудозиш / сахтшавӣ <span class="tag-mono">Q = λ·m</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="meltL">Гармии хоси гудозиш λ (Ҷ/кг)</label><input id="meltL" type="number" step="any" placeholder="масалан: 330000 (ях)"></div>
+        <div class="field"><label for="meltM">Масса m (кг)</label><input id="meltM" type="number" step="any"></div>
+        <div class="field"><label for="meltQ">Гармӣ Q (Ҷ)</label><input id="meltQ" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcMelt">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Бухоршавӣ / конденсатсия <span class="tag-mono">Q = L·m</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="vapL">Гармии хоси бухоршавӣ L (Ҷ/кг)</label><input id="vapL" type="number" step="any" placeholder="масалан: 2260000 (об)"></div>
+        <div class="field"><label for="vapM">Масса m (кг)</label><input id="vapM" type="number" step="any"></div>
+        <div class="field"><label for="vapQ">Гармӣ Q (Ҷ)</label><input id="vapQ" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcVaporize">Ҳисоб кардан</button></div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-pressure">
+    <div class="panel-card">
+      <h2>Зичӣ <span class="tag-mono">ρ = m/V</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="densM">Масса m (кг)</label><input id="densM" type="number" step="any"></div>
+        <div class="field"><label for="densV">Ҳаҷм V (м³)</label><input id="densV" type="number" step="any"></div>
+        <div class="field"><label for="densR">Зичӣ ρ (кг/м³)</label><input id="densR" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcDensity">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Фишор <span class="tag-mono">P = F/S</span></h2>
+      <p class="small muted">Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="presF">Қувва F (Н)</label><input id="presF" type="number" step="any"></div>
+        <div class="field"><label for="presS">Масоҳат S (м²)</label><input id="presS" type="number" step="any"></div>
+        <div class="field"><label for="presP">Фишор P (Па)</label><input id="presP" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcPressure">Ҳисоб кардан</button></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Фишори гидростатикӣ <span class="tag-mono">P = ρ·g·h</span></h2>
+      <p class="small muted">g = 9.8 м/с². Як майдонро холӣ монед.</p>
+      <div class="field-grid-3">
+        <div class="field"><label for="hydroRho">Зичии моеъ ρ (кг/м³)</label><input id="hydroRho" type="number" step="any" placeholder="масалан: 1000 (об)"></div>
+        <div class="field"><label for="hydroH">Чуқурӣ h (м)</label><input id="hydroH" type="number" step="any"></div>
+        <div class="field"><label for="hydroP">Фишор P (Па)</label><input id="hydroP" type="number" step="any"></div>
+      </div>
+      <div class="btn-row"><button id="calcHydro">Ҳисоб кардан</button></div>
+    </div>
+  </section>
+
+</main>
+</div>
+<div class="subject" id="subject-chemistry" data-subject-panel="chemistry" hidden>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn is-active" data-target="panel-formulas" role="tab"><span data-i18n="chem-tab-formulas">Формула</span></button>
+  <button class="tab-btn" data-target="panel-reaction" role="tab"><span data-i18n="chem-tab-reaction">Реаксия</span></button>
+  <button class="tab-btn" data-target="panel-phgas" role="tab"><span data-i18n="chem-tab-phgas">pH · Газ</span></button>
+  <button class="tab-btn" data-target="panel-conc" role="tab"><span data-i18n="chem-tab-conc">Консентратсия</span></button>
+  <button class="tab-btn" data-target="panel-enthalpy" role="tab"><span data-i18n="chem-tab-enthalpy">Энталпия</span></button>
+  <button class="tab-btn" data-target="panel-chemproblems" role="tab"><span data-i18n="chem-tab-problems">Масъалаҳо</span></button>
+  <button class="tab-btn" data-target="panel-masses" role="tab"><span data-i18n="chem-tab-masses">Массаҳо</span></button>
+</nav>
+
+<main class="stage">
+
+    <section class="panel is-active" id="panel-formulas">
+    <div class="panel-card">
+      <h2>Формулаҳо ва массаҳо</h2>
+      <div class="field">
+        <label for="chemFormula">Формула</label>
+        <input id="chemFormula" placeholder="масалан: H2O, Ca(OH)2" />
+      </div>
+      <div class="btn-row">
+        <button id="calcMM">Массаи молярӣ</button>
+        <button id="pct" class="secondary">% таркиб</button>
+      </div>
+      <div class="divider"></div>
+      <div class="field-row">
+        <div class="field">
+          <label for="chemMassInput">Масса (г)</label>
+          <input id="chemMassInput" type="number" step="any" placeholder="0.0" />
+        </div>
+        <div class="field">
+          <label for="chemMolesInput">Молҳо</label>
+          <input id="chemMolesInput" type="number" step="any" placeholder="0.0" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button id="massToMoles">Масса → моль</button>
+        <button id="molesToMass" class="secondary">Моль → масса</button>
+      </div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-reaction">
+    <div class="panel-card">
+      <h2>Реаксияҳоро баланс кардан</h2>
+      <div class="field">
+        <label for="chemReaction">Реаксия</label>
+        <input id="chemReaction" placeholder="масалан: H2 + O2 -> H2O" />
+      </div>
+      <div class="btn-row">
+        <button id="balanceReaction">Баланс кардан</button>
+      </div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-phgas">
+    <div class="panel-card">
+      <h2>pH</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="phConc">Концентратсия (моль/л)</label>
+          <input id="phConc" type="number" step="any" placeholder="0.0" />
+        </div>
+        <div class="field">
+          <label for="phType">Намуд</label>
+          <select id="phType">
+            <option value="acid">Кислота (H⁺)</option>
+            <option value="base">Осн. (OH⁻)</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button id="calcPH">Ҳисоб кардани pH</button>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Қонуни газҳо <span class="tag-mono">PV = nRT</span></h2>
+      <div class="field-grid">
+        <div class="field"><label for="gasP">Давр (атм)</label><input id="gasP" type="number" step="any" placeholder="P" /></div>
+        <div class="field"><label for="gasV">Ҳаҷм (л)</label><input id="gasV" type="number" step="any" placeholder="V" /></div>
+        <div class="field"><label for="gasT">Ҳарорат (K)</label><input id="gasT" type="number" step="any" placeholder="T" /></div>
+        <div class="field"><label for="gasN">n (моль)</label><input id="gasN" type="number" step="any" placeholder="n" /></div>
+      </div>
+      <div class="btn-row">
+        <button id="calcGas">Ҳисоб кардан</button>
+      </div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-conc">
+    <div class="panel-card">
+      <h2>Консентратсияҳо</h2>
+      <div class="field">
+        <label for="massSolute">Масса ҳалшуда (г)</label>
+        <input id="massSolute" type="number" step="any" placeholder="0.0" />
+      </div>
+      <div class="field">
+        <label for="volumeSol">Ҳаҷм (л)</label>
+        <input id="volumeSol" type="number" step="any" placeholder="0.0" />
+      </div>
+      <div class="field">
+        <label for="formulaConc">Формула (барои молярӣ)</label>
+        <input id="formulaConc" placeholder="масалан: NaCl" />
+      </div>
+      <div class="btn-row">
+        <button id="calcMolarity">Молярият (M)</button>
+        <button id="calcPercent" class="secondary">Консентратсия (%)</button>
+      </div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-enthalpy">
+    <div class="panel-card">
+      <h2>Энталпия</h2>
+      <div class="field">
+        <label for="reactantsEnth">Энталпияҳои реагентҳо (кДж/моль)</label>
+        <input id="reactantsEnth" placeholder="масалан: -285.8, 0" />
+      </div>
+      <div class="field">
+        <label for="productsEnth">Энталпияҳои продуктҳо (кДж/моль)</label>
+        <input id="productsEnth" placeholder="масалан: -393.5, -571.6" />
+      </div>
+      <div class="btn-row">
+        <button id="calcEnthalpy">Ҳисоб кардани ΔH</button>
+      </div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-chemproblems">
+    <div class="panel-card">
+      <h2>Ҳалли масъалаҳои химиявӣ</h2>
+      <div class="field">
+        <label for="chemProbType">Навъи масъала</label>
+        <select id="chemProbType">
+          <option value="stoich">Стехиометрия (реаксия → масса)</option>
+          <option value="limiting">Реагенти маҳдудкунанда</option>
+          <option value="dilution">Тайёр кардани маҳлул (C₁V₁=C₂V₂)</option>
+          <option value="yield">Ҳосили реаксия (%)</option>
+          <option value="empirical">Формулаи эмпирикӣ (аз %)</option>
+        </select>
+      </div>
+
+      <div class="prob-fields is-active" data-prob="stoich">
+        <div class="field"><label for="stoichEquation">Реаксияи баланскардашуда</label><input id="stoichEquation" placeholder="масалан: 2 H2 + O2 -> 2 H2O" /></div>
+        <div class="field-row">
+          <div class="field"><label for="stoichKnownFormula">Моддаи маълум</label><input id="stoichKnownFormula" placeholder="H2" /></div>
+          <div class="field"><label for="stoichKnownMass">Масса (г)</label><input id="stoichKnownMass" type="number" step="any" placeholder="0.0" /></div>
+        </div>
+        <div class="field"><label for="stoichTargetFormula">Моддаи ҷустуҷӯшаванда</label><input id="stoichTargetFormula" placeholder="H2O" /></div>
+      </div>
+
+      <div class="prob-fields" data-prob="limiting" hidden>
+        <div class="field"><label for="limEquation">Реаксияи баланскардашуда</label><input id="limEquation" placeholder="масалан: N2 + 3 H2 -> 2 NH3" /></div>
+        <div class="field-row">
+          <div class="field"><label for="limF1">Реагенти 1</label><input id="limF1" placeholder="N2" /></div>
+          <div class="field"><label for="limMass1">Масса 1 (г)</label><input id="limMass1" type="number" step="any" placeholder="0.0" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="limF2">Реагенти 2</label><input id="limF2" placeholder="H2" /></div>
+          <div class="field"><label for="limMass2">Масса 2 (г)</label><input id="limMass2" type="number" step="any" placeholder="0.0" /></div>
+        </div>
+        <div class="field"><label for="limProduct">Маҳсулот</label><input id="limProduct" placeholder="NH3" /></div>
+      </div>
+
+      <div class="prob-fields" data-prob="dilution" hidden>
+        <p class="small muted">Як майдонро холӣ монед — он ҳисоб карда мешавад.</p>
+        <div class="field-grid">
+          <div class="field"><label for="dilC1">C₁ (моль/л)</label><input id="dilC1" type="number" step="any" placeholder="C1" /></div>
+          <div class="field"><label for="dilV1">V₁ (л)</label><input id="dilV1" type="number" step="any" placeholder="V1" /></div>
+          <div class="field"><label for="dilC2">C₂ (моль/л)</label><input id="dilC2" type="number" step="any" placeholder="C2" /></div>
+          <div class="field"><label for="dilV2">V₂ (л)</label><input id="dilV2" type="number" step="any" placeholder="V2" /></div>
+        </div>
+      </div>
+
+      <div class="prob-fields" data-prob="yield" hidden>
+        <div class="field-row">
+          <div class="field"><label for="yieldActual">Ҳосили воқеӣ (г)</label><input id="yieldActual" type="number" step="any" placeholder="0.0" /></div>
+          <div class="field"><label for="yieldTheoretical">Ҳосили назариявӣ (г)</label><input id="yieldTheoretical" type="number" step="any" placeholder="0.0" /></div>
+        </div>
+      </div>
+
+      <div class="prob-fields" data-prob="empirical" hidden>
+        <div class="field">
+          <label for="empComposition">Таркиби фоизӣ</label>
+          <input id="empComposition" placeholder="масалан: C:40, H:6.7, O:53.3" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button id="chemSolveProblem">Ҳал кардан</button>
+      </div>
+    </div>
+  </section>
+
+    <section class="panel" id="panel-masses">
+    <div class="panel-card">
+      <h2>Массаҳои атомӣ (танзимшаванда)</h2>
+      <p class="small muted">Агар намехоҳӣ тағйирдиҳӣ — боқи монад холӣ. Формат: <code>Fe:55.845</code> (як сатр — як ҷуфт)</p>
+      <textarea id="customMasses" rows="7" placeholder="Fe:55.845"></textarea>
+      <div class="btn-row">
+        <button id="applyCustom">Татбиқ кардан</button>
+        <button id="resetDefault" class="secondary">Барқарор кардан (дефолт)</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+<footer class="foot">
+  <p class="foot-brand">MRX-COMPILER — <span data-i18n="foot-line">ҳар масъала як роҳи ҳал дорад</span></p>
+  <div class="contact-row">
+    <a href="https://t.me/+992325584" class="contact-chip" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M21.9 3.7c.3-1-.6-1.8-1.6-1.4L1.4 10c-1 .4-1 1.9 0 2.2l4.8 1.5 1.9 5.9c.3 1 1.6 1.2 2.2.3l2.6-3.6 4.9 3.6c.8.6 2 .2 2.2-.8L21.9 3.7zM8.3 13.2l9.2-6.6c.3-.2.6.1.4.4l-7.6 7.5c-.3.3-.5.7-.5 1.1l-.2 2.5-.9-3.5c-.1-.5.1-1 .6-1.4z"/></svg> Telegram</a>
+    <a href="https://wa.me/992325584" class="contact-chip" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.6-1.2-3.1s.8-2.2 1.1-2.5c.3-.3.6-.4.8-.4h.6c.2 0 .5 0 .7.5l1 2.4c.1.2.1.4 0 .6l-.5.7c-.1.2-.2.4 0 .6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.2.1.4.1.5-.1l.7-.8c.2-.3.4-.2.7-.1l2.1 1c.2.1.4.2.5.3.1.2.1.9-.1 1.6z"/></svg> WhatsApp</a>
+    <a href="https://instagram.com/obidzoda_ehson" class="contact-chip" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg> @obidzoda_ehson</a>
+  </div>
+  <p class="small muted" style="margin-top:8px;">032558484</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
